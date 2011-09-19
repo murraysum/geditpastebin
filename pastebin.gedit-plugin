@@ -1,0 +1,10 @@
+[Gedit Plugin]
+Loader=python
+Module=pastebin
+IAge=2
+Name=Pastebin
+Description=Upload documents to Pastebin 
+Authors=Murray Summers
+Copyright=Copyright © 2011 Murray Summers
+Website=http://www.geek-alert.com
+Icon=gtk-paste
