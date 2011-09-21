@@ -70,6 +70,32 @@ class ConfigureDialog():
 	def on_acct_radio_toggled(self, widget, data=None):
 		self.set_sensitive(True)
 
+class UploadDialog():
+	
+	def __init__(self):
+		pass
+		
+	def create_dialog(self):
+		self.builder = gtk.Builder()
+		f = os.path.join(os.path.dirname(__file__), "upload1.glade")
+		self.builder.add_from_file(f)
+		self.builder.connect_signals(self)
+		dialog = self.builder.get_object("upload_dialog")
+		dialog.show()
+
+	def set_name(self, doc):
+		pass
+		#args["name"] = doc.get_short_name_for_display()
+	def set_lang(self):
+		pass
+	def set_expiry(self):
+		pass
+	
+	def set_private(self):
+		pass
+		
+	def on_entry_clear(self, entry, icon_pos, data=None):
+		entry.set_text("")
 class ExceptionDialog():
 	
 	def __init__(self, exception):
@@ -136,39 +162,41 @@ class MenuItem():
 
 	# Upload menu item handler
 	def on_upload(self, action, data=None):
-		# Get paste text
-		doc = self._window.get_active_document()
-		start = doc.get_start_iter()
-		end = doc.get_end_iter()
-		text = start.get_text(end)
+		upload = UploadDialog()
+		upload.create_dialog()
+		## Get paste text
+		#doc = self._window.get_active_document()
+		#start = doc.get_start_iter()
+		#end = doc.get_end_iter()
+		#text = start.get_text(end)
 		
-		args = {}	
-		# Get language
-		lang = doc.get_language()
-		if lang is not None:
-			args["lang"] = lang.get_name()
+		#args = {}	
+		## Get language
+		#lang = doc.get_language()
+		#if lang is not None:
+			#args["lang"] = lang.get_name()
 		
-		# Get title	
-		args["name"] = doc.get_short_name_for_display()
+		## Get title	
+		#args["name"] = doc.get_short_name_for_display()
 		
-		# Get usr & pwd
-		if self.account.exists():
-			usr, pwd = self.account.get_details()
-			args["usr"] = usr
-			args["pwd"] = pwd
+		## Get usr & pwd
+		#if self.account.exists():
+			#usr, pwd = self.account.get_details()
+			#args["usr"] = usr
+			#args["pwd"] = pwd
 		
-		try:
-			url = self.core.paste(text, **args)
-			opts={}
-			opts["buttons"] = gtk.BUTTONS_OK
-			opts["message_format"] = "Pastebin URI"
-			dialog = gtk.MessageDialog(**opts)
-			dialog.connect("response", lambda d, r: d.destroy())
-			dialog.set_title("Gedit Pastebin Plugin")
-			dialog.format_secondary_text(url)
-			dialog.show()
+		#try:
+			#url = self.core.paste(text, **args)
+			#opts={}
+			#opts["buttons"] = gtk.BUTTONS_OK
+			#opts["message_format"] = "Pastebin URI"
+			#dialog = gtk.MessageDialog(**opts)
+			#dialog.connect("response", lambda d, r: d.destroy())
+			#dialog.set_title("Gedit Pastebin Plugin")
+			#dialog.format_secondary_text(url)
+			#dialog.show()
 			 
-		except CoreError as e:
-			ed = ExceptionDialog(e)
-			dialog = ed.get_dialog()
-			dialog.show()
+		#except CoreError as e:
+			#ed = ExceptionDialog(e)
+			#dialog = ed.get_dialog()
+			#dialog.show()
