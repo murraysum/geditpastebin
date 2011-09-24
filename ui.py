@@ -57,9 +57,7 @@ class ConfigureDialog():
 			pwd = self.pwd_entry.get_text()
 			usr = self.usr_entry.get_text()
 			self.account.set_details(usr, pwd)	
-		
-		dialog = self.builder.get_object("config_dialog")
-		dialog.destroy()
+		self.dialog.destroy()
 
 	def set_sensitive(self, hide):
 		self.acct_cont.set_sensitive(hide)
@@ -72,17 +70,34 @@ class ConfigureDialog():
 
 class UploadDialog():
 	
-	def __init__(self):
-		pass
+	def __init__(self, doc):
+		self.doc = doc
 		
 	def create_dialog(self):
 		self.builder = gtk.Builder()
-		f = os.path.join(os.path.dirname(__file__), "upload1.glade")
+		f = os.path.join(os.path.dirname(__file__), "upload.glade")
 		self.builder.add_from_file(f)
 		self.builder.connect_signals(self)
-		dialog = self.builder.get_object("upload_dialog")
-		dialog.show()
+		self.dialog = self.builder.get_object("upload_dialog")
+		self.init_widgets()
+		self.dialog.show()
 
+	def init_widgets(self):
+		self.name_entry = self.builder.get_object("name_entry")
+		name = self.doc.get_short_name_for_display()
+		self.name_entry.set_text(name)
+		
+		self.syntax_combo = self.builder.get_object("syntax_combo")
+		self.expiry_combo = self.builder.get_object("expiry_combo")
+		self.private_combo = self.builder.get_object("private_combo")
+		store = gtk.ListStore(str)
+		store.append(["Yes"])
+		store.append(["No"])
+		self.private_combo.set_model(store)
+		self.private_combo.set_active(0)
+		cell = gtk.CellRendererText()
+		self.private_combo.pack_start(cell, True)
+		self.private_combo.add_attribute(cell, "text", 0)
 	def set_name(self, doc):
 		pass
 		#args["name"] = doc.get_short_name_for_display()
@@ -93,9 +108,17 @@ class UploadDialog():
 	
 	def set_private(self):
 		pass
+	
+	def on_cancel_button_clicked(self, widget, data=None):
+		self.dialog.destroy()
+	
+	def on_upload_button_clicked(self, widget, data=None):
+		self.dialog.destroy()
+		print "Pastebin Upload"
 		
-	def on_entry_clear(self, entry, icon_pos, data=None):
+	def on_name_entry_icon_press(self, entry, icon_pos, data=None):
 		entry.set_text("")
+		
 class ExceptionDialog():
 	
 	def __init__(self, exception):
@@ -162,7 +185,8 @@ class MenuItem():
 
 	# Upload menu item handler
 	def on_upload(self, action, data=None):
-		upload = UploadDialog()
+		doc = self._window.get_active_document()
+		upload = UploadDialog(doc)
 		upload.create_dialog()
 		## Get paste text
 		#doc = self._window.get_active_document()
