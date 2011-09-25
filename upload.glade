@@ -2,6 +2,24 @@
 <interface>
   <requires lib="gtk+" version="2.24"/>
   <!-- interface-naming-policy project-wide -->
+  <object class="GtkListStore" id="dates_store">
+    <columns>
+      <!-- column-name List -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="langs_store">
+    <columns>
+      <!-- column-name List -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="private_store">
+    <columns>
+      <!-- column-name List -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkDialog" id="upload_dialog">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
@@ -133,11 +151,11 @@
               </object>
             </child>
             <child>
-              <object class="GtkLabel" id="syntax_label">
+              <object class="GtkLabel" id="langs_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
-                <property name="label" translatable="yes">Syntax Highlighting:</property>
+                <property name="label" translatable="yes">Language:</property>
               </object>
               <packing>
                 <property name="top_attach">1</property>
@@ -145,7 +163,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="expiry_label">
+              <object class="GtkLabel" id="dates_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
@@ -186,9 +204,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkComboBox" id="syntax_combo">
+              <object class="GtkComboBox" id="langs_combo">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="model">langs_store</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -198,9 +217,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkComboBox" id="expiry_combo">
+              <object class="GtkComboBox" id="dates_combo">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="model">dates_store</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -213,6 +233,7 @@
               <object class="GtkComboBox" id="private_combo">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="model">private_store</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>

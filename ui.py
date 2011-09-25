@@ -72,6 +72,8 @@ class UploadDialog():
 	
 	def __init__(self, doc):
 		self.doc = doc
+		self.core = Core()
+		self.account = Account()
 		
 	def create_dialog(self):
 		self.builder = gtk.Builder()
@@ -84,37 +86,89 @@ class UploadDialog():
 
 	def init_widgets(self):
 		self.name_entry = self.builder.get_object("name_entry")
-		name = self.doc.get_short_name_for_display()
-		self.name_entry.set_text(name)
-		
-		self.syntax_combo = self.builder.get_object("syntax_combo")
-		self.expiry_combo = self.builder.get_object("expiry_combo")
+		self.set_name(self.doc)
+		self.langs_combo = self.builder.get_object("langs_combo")
+		self.set_langs(self.doc)
+		self.dates_combo = self.builder.get_object("dates_combo")
+		self.set_dates()
 		self.private_combo = self.builder.get_object("private_combo")
-		store = gtk.ListStore(str)
-		store.append(["Yes"])
-		store.append(["No"])
-		self.private_combo.set_model(store)
-		self.private_combo.set_active(0)
+		self.set_private()
+		
+	def fill_combo_box(self, combo, items, active_item):
+		model = combo.get_model()
+		i = 0
+		for item in items:
+			model.append([item])
+			if item.lower() == active_item.lower():
+				combo.set_active(i)
+			i = i + 1
+		if combo.get_active() == -1:
+			combo.set_active(0)
 		cell = gtk.CellRendererText()
-		self.private_combo.pack_start(cell, True)
-		self.private_combo.add_attribute(cell, "text", 0)
+		combo.pack_start(cell, True)
+		combo.add_attribute(cell, "text", 0)
+		
 	def set_name(self, doc):
-		pass
-		#args["name"] = doc.get_short_name_for_display()
-	def set_lang(self):
-		pass
-	def set_expiry(self):
-		pass
+		name = doc.get_short_name_for_display()
+		self.name_entry.set_text(name)
+	
+	def set_langs(self, doc):
+		src_lang = doc.get_language()
+		lang = "None"
+		if src_lang is not None:
+			lang = src_lang.get_name()
+		langs = self.core.get_langs()
+		self.fill_combo_box(self.langs_combo, langs, lang)
+		
+	def set_dates(self):
+		dates = self.core.get_dates() 
+		self.fill_combo_box(self.dates_combo, dates, "")
 	
 	def set_private(self):
-		pass
+		self.fill_combo_box(self.private_combo, ["Yes","No"], "")
 	
 	def on_cancel_button_clicked(self, widget, data=None):
 		self.dialog.destroy()
 	
 	def on_upload_button_clicked(self, widget, data=None):
+		
+		# Get paste text
+		start = self.doc.get_start_iter()
+		end = self.doc.get_end_iter()
+		text = start.get_text(end)
+		
+		args = {}
+		args["name"] = self.name_entry.get_text()
+		
+		lang_index = self.langs_combo.get_active()
+		lang_model = self.langs_combo.get_model()
+		args["lang"] = lang_model[lang_index][0]
+		
+		date_index = self.dates_combo.get_active()
+		date_model = self.dates_combo.get_model()
+		args["date"] = date_model[date_index][0]
+		
+		# Get usr & pwd
+		if self.account.exists():
+			usr, pwd = self.account.get_details()
+			args["usr"] = usr
+			args["pwd"] = pwd
+		
 		self.dialog.destroy()
-		print "Pastebin Upload"
+		try:
+			url = self.core.paste(text, **args)
+			opts={}
+			opts["buttons"] = gtk.BUTTONS_OK
+			opts["message_format"] = "Pastebin URI"
+			dialog = gtk.MessageDialog(**opts)
+			dialog.connect("response", lambda d, r: d.destroy())
+			dialog.set_title("Gedit Pastebin Plugin")
+			dialog.format_secondary_text(url)
+			dialog.show() 
+		except CoreError as e:
+			ed = ExceptionDialog(e)
+			dialog = ed.get_dialog()
+			dialog.show()
 		
 	def on_name_entry_icon_press(self, entry, icon_pos, data=None):
 		entry.set_text("")
