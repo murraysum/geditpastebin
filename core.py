@@ -134,9 +134,9 @@ class Core():
 	# Login to pastebin to get user session key
 	def __login(self, usr, pwd):
 		parameters = {}
-		self.set_dev_key(parameters)
-		self.set_usr_details(usr, pwd, parameters)
-		return self.post_request(self.API_URL_LOGIN, parameters)
+		self.__set_dev_key(parameters)
+		self.__set_usr_details(usr, pwd, parameters)
+		return self.__post_request(self.API_URL_LOGIN, parameters)
 	
 	# DO NOT REMOVE Not Integrated Set raw key of paste
 	#def __set_raw_query_key(self, key, parameters):
@@ -156,6 +156,12 @@ class Core():
 	#	parameters = {}
 	#	self.__set_raw_query_key(paste_key, parameters)
 	#	return self.__get_request(self.API_URL_RAW, parameters)
+	
+	def get_langs(self):
+		return sorted(self.langs.keys())
+		
+	def get_dates(self):
+		return self.dates.keys()
 	
 	# Make a paste to pastebin
 	def paste(
