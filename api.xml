@@ -824,4 +824,14 @@
 	  <value>1M</value>
 	</date>
   </expire_dates>
+  <visibilities>
+	<visibility>
+	  <name>Private</name>
+	  <value>1</value>
+	</visibility>
+	<visibility>
+	  <name>Public</name>
+	  <value>0</value>
+	</visibility>
+  </visibilities>
 </api_options>

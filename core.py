@@ -24,12 +24,11 @@ class Core():
 	
 	DEV_KEY = "1d6e3cfe11d7f9d2b72a060662c1009d"
 	
-	PASTE_PRIVATE = (1,0)
-	
 	# Create a core object to communicate with Pastebin
 	def __init__(self):
 		self.langs = {}
 		self.dates = {}
+		self.visibilities = {}
 		self.__load_api_options()
 		
 	# Load the Pastebin API
@@ -51,6 +50,11 @@ class Core():
 			name = date.find("name")
 			value = date.find("value")
 			self.dates[name.text] = value.text
+		visibilities = tree.findall("//visibility")
+		for visibility in visibilities:
+			name = visibility.find("name")
+			value = visibility.find("value")
+			self.visibilities[name.text] = value.text
 		
 	# Set the developer key
 	def __set_dev_key(self, parameters):
@@ -70,8 +74,9 @@ class Core():
 		
 	# Sets whether a paste is public or private
 	def __set_private(self, private, parameters):
-		if private in self.PASTE_PRIVATE:
-			parameters[self.API_PASTE_PRIVATE] = private
+		if private in self.visibilities:
+			p = self.visibilities.get(private)
+			parameters[self.API_PASTE_PRIVATE] = p
 		else:
 			raise CoreError("Bad API request, invalid api_paste_private")
 
@@ -162,17 +167,20 @@ class Core():
 		
 	def get_dates(self):
 		return self.dates.keys()
-	
+		
+	def get_visibilities(self):
+		return self.visibilities.keys()
+		
 	# Make a paste to pastebin
 	def paste(
-			self, text, name=None, private=None, date=None,
+			self, text, name=None, visibility=None, date=None,
 			lang=None, usr=None, pwd=None):
 		parameters = {}
 		self.__set_dev_key(parameters)
 		self.__set_option("paste", parameters)
 		self.__set_paste_text(text, parameters)
-		if(private is not None):
-			self.__set_private(private, parameters)
+		if(visibility is not None):
+			self.__set_private(visibility, parameters)
 		if(name is not None):
 			self.__set_paste_name(name, parameters)
 		if(date is not None):
