@@ -17,7 +17,6 @@ class ConfigureDialog():
 			self.account = Account()
 			self.init_widgets()
 			return self.dialog
-			
 		except AccountError as e:
 			dialog = ExceptionDialog(e)
 			return dialog.get_dialog()
@@ -91,8 +90,8 @@ class UploadDialog():
 		self.set_langs(self.doc)
 		self.dates_combo = self.builder.get_object("dates_combo")
 		self.set_dates()
-		self.private_combo = self.builder.get_object("private_combo")
-		self.set_private()
+		self.visibility_combo = self.builder.get_object("visibility_combo")
+		self.set_visibilities()
 		
 	def fill_combo_box(self, combo, items, active_item):
 		model = combo.get_model()
@@ -124,18 +123,34 @@ class UploadDialog():
 		dates = self.core.get_dates() 
 		self.fill_combo_box(self.dates_combo, dates, "")
 	
-	def set_private(self):
-		self.fill_combo_box(self.private_combo, ["Yes","No"], "")
+	def set_visibilities(self):
+		visibilities = self.core.get_visibilities()
+		self.fill_combo_box(self.visibility_combo, visibilities, "")
 	
 	def on_cancel_button_clicked(self, widget, data=None):
 		self.dialog.destroy()
 	
 	def on_upload_button_clicked(self, widget, data=None):
-		
-		# Get paste text
-		start = self.doc.get_start_iter()
-		end = self.doc.get_end_iter()
-		text = start.get_text(end)
+		sel_radio = self.builder.get_object("sel_radio")
+		text = ""
+		if sel_radio.get_active():
+			sel = self.doc.get_selection_bounds()
+			if sel != ():
+				(start, end) = sel
+				if start.ends_line():
+					start.forward_line()
+				elif not start.starts_line():
+					start.set_line_offset(0)
+				if end.starts_line():
+					end.backward_char()
+				elif not end.ends_line():
+					end.forward_to_line_end()
+				text = start.get_text(end)
+		else:
+			# Get paste text
+			start = self.doc.get_start_iter()
+			end = self.doc.get_end_iter()
+			text = start.get_text(end)
 		
 		args = {}
 		args["name"] = self.name_entry.get_text()
@@ -148,6 +163,9 @@ class UploadDialog():
 		date_model = self.dates_combo.get_model()
 		args["date"] = date_model[date_index][0]
 		
+		visibility_index = self.visibility_combo.get_active()
+		visibility_model = self.visibility_combo.get_model()
+		args["visibility"] = visibility_model[visibility_index][0]
 		# Get usr & pwd
 		if self.account.exists():
 			usr, pwd = self.account.get_details()
@@ -162,7 +180,7 @@ class UploadDialog():
 			opts["message_format"] = "Pastebin URI"
 			dialog = gtk.MessageDialog(**opts)
 			dialog.connect("response", lambda d, r: d.destroy())
-			dialog.set_title("Gedit Pastebin Plugin")
+			dialog.set_title("Pastebin Plugin")
 			dialog.format_secondary_text(url)
 			dialog.show() 
 		except CoreError as e:
@@ -199,7 +217,7 @@ class ExceptionDialog():
 		self.dialog.format_secondary_text(msg)
 		
 	def set_title(self):
-		self.dialog.set_title("Gedit Pastebin Plugin")
+		self.dialog.set_title("Pastebin Plugin")
 		
 	def get_dialog(self):
 		return self.dialog
@@ -242,39 +260,3 @@ class MenuItem():
 		doc = self._window.get_active_document()
 		upload = UploadDialog(doc)
 		upload.create_dialog()
-		## Get paste text
-		#doc = self._window.get_active_document()
-		#start = doc.get_start_iter()
-		#end = doc.get_end_iter()
-		#text = start.get_text(end)
-		
-		#args = {}	
-		## Get language
-		#lang = doc.get_language()
-		#if lang is not None:
-			#args["lang"] = lang.get_name()
-		
-		## Get title	
-		#args["name"] = doc.get_short_name_for_display()
-		
-		## Get usr & pwd
-		#if self.account.exists():
-			#usr, pwd = self.account.get_details()
-			#args["usr"] = usr
-			#args["pwd"] = pwd
-		
-		#try:
-			#url = self.core.paste(text, **args)
-			#opts={}
-			#opts["buttons"] = gtk.BUTTONS_OK
-			#opts["message_format"] = "Pastebin URI"
-			#dialog = gtk.MessageDialog(**opts)
-			#dialog.connect("response", lambda d, r: d.destroy())
-			#dialog.set_title("Gedit Pastebin Plugin")
-			#dialog.format_secondary_text(url)
-			#dialog.show()
-			 
-		#except CoreError as e:
-			#ed = ExceptionDialog(e)
-			#dialog = ed.get_dialog()
-			#dialog.show()

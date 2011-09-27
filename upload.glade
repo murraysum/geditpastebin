@@ -14,12 +14,6 @@
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkListStore" id="private_store">
-    <columns>
-      <!-- column-name List -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
   <object class="GtkDialog" id="upload_dialog">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
@@ -155,7 +149,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
-                <property name="label" translatable="yes">Language:</property>
+                <property name="label" translatable="yes">Syntax Language:</property>
               </object>
               <packing>
                 <property name="top_attach">1</property>
@@ -167,7 +161,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
-                <property name="label" translatable="yes">Expiry Time:</property>
+                <property name="label" translatable="yes">Expiry Date:</property>
               </object>
               <packing>
                 <property name="top_attach">2</property>
@@ -175,11 +169,11 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="private_label">
+              <object class="GtkLabel" id="visibility_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
-                <property name="label" translatable="yes">Private:</property>
+                <property name="label" translatable="yes">Visibility:</property>
               </object>
               <packing>
                 <property name="top_attach">3</property>
@@ -230,10 +224,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkComboBox" id="private_combo">
+              <object class="GtkComboBox" id="visibility_combo">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="model">private_store</property>
+                <property name="model">visibility_store</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -255,5 +249,11 @@
       <action-widget response="0">cancel_button</action-widget>
       <action-widget response="0">upload_button</action-widget>
     </action-widgets>
+  </object>
+  <object class="GtkListStore" id="visibility_store">
+    <columns>
+      <!-- column-name List -->
+      <column type="gchararray"/>
+    </columns>
   </object>
 </interface>
