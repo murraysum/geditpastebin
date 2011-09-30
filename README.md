@@ -16,6 +16,6 @@ Installation
 
 1. Download Gedit Pastebin package.
 2. Copy the file "pastebin.gedit-plugin" to ~/.gnome2/gedit/plugins/
-3 Copy the rest of the contents to ~/.gnome2/gedit/plugins/pastebin/ (You may have to create the folder "pastebin")
+3. Copy the rest of the contents to ~/.gnome2/gedit/plugins/pastebin/ (You may have to create the folder "pastebin")
 4. Restart gedit
 5. Activate the plugin under 'Edit -> Preferences -> Plugins'
