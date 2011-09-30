@@ -29,7 +29,7 @@ class PastebinPlugin(gedit.Plugin):
 	def __init__(self):
 		gedit.Plugin.__init__(self)
 		self._instances = {}
-
+		
 	def activate(self, window):
 		print "Pastebin Plugin Activated"
 		self._instances[window] = PastebinWindowHelper(self, window)

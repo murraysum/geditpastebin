@@ -1,8 +1,8 @@
-import sys
 import os
 import re
 import urllib
-from lxml import etree
+
+import xml.dom.minidom
 
 class Core():
 
@@ -23,6 +23,7 @@ class Core():
 	API_URL_RAW = "http://pastebin.com/raw.php"
 	
 	DEV_KEY = "1d6e3cfe11d7f9d2b72a060662c1009d"
+	API_FILE = "api.xml"
 	
 	# Create a core object to communicate with Pastebin
 	def __init__(self):
@@ -31,31 +32,28 @@ class Core():
 		self.visibilities = {}
 		self.__load_api_options()
 		
-	# Load the Pastebin API
+	# Load the Pastebin API from file
 	def __load_api_options(self):
-		parser = etree.XMLParser(remove_blank_text=True)
 		try:
-			f = os.path.join(os.path.dirname(__file__), "api.xml")
-			tree = etree.parse(f, parser)
+			dirname = os.path.dirname(__file__)
+			fd = os.path.join(dirname, self.API_FILE)
+			doc = xml.dom.minidom.parse(fd)
+			langs = doc.getElementsByTagName("language")
+			self.__store_api_options(langs, self.langs)
+			dates = doc.getElementsByTagName("date")
+			self.__store_api_options(dates, self.dates)
+			visibilities = doc.getElementsByTagName("visibility")
+			self.__store_api_options(visibilities, self.visibilities)
 		except IOError as e:
 			raise CoreError(e)
-		languages = tree.findall("//language")
-		for language in languages:
-			name = language.find("name")
-			value = language.find("value")
-			self.langs[name.text] = value.text
 		
-		dates = tree.findall("//date")
-		for date in dates:
-			name = date.find("name")
-			value = date.find("value")
-			self.dates[name.text] = value.text
-		visibilities = tree.findall("//visibility")
-		for visibility in visibilities:
-			name = visibility.find("name")
-			value = visibility.find("value")
-			self.visibilities[name.text] = value.text
-		
+	# Store the api options into a store dictionary
+	def __store_api_options(self, options, store):
+		for option in options:
+			name = option.getElementsByTagName("name").item(0)
+			value = option.getElementsByTagName("value").item(0)
+			store[name.firstChild.data] = value.firstChild.data
+
 	# Set the developer key
 	def __set_dev_key(self, parameters):
 		parameters[self.API_DEV_KEY] = self.DEV_KEY
