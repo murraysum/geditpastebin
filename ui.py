@@ -224,11 +224,22 @@ class ExceptionDialog():
 
 class MenuItem():
 	
-	ui_str = """<ui>
+	create_str = """<ui>
 	<menubar name="MenuBar">
 		<menu name="ToolsMenu" action="Tools">
 		<placeholder name="ToolsOps_1">
-			<menuitem name="Upload" action="Upload"/>
+			<menuitem name="Create" action="Create"/>
+		</placeholder>
+		</menu>
+	</menubar>
+	</ui>
+	"""
+	
+	get_str = """<ui>
+	<menubar name="MenuBar">
+		<menu name="ToolsMenu" action="Tools">
+		<placeholder name="ToolsOps_1">
+			<menuitem name="Get" action="Get"/>
 		</placeholder>
 		</menu>
 	</menubar>
@@ -243,20 +254,31 @@ class MenuItem():
 		self._window = window
 		manager = self._window.get_ui_manager()
 		self.group = gtk.ActionGroup("PastebinPlugin")
-		self.group.add_actions([("Upload", None, _("Upload to Pastebin"),
-										 "<control>U", _("Upload to Pastebin"),
-										 self.on_upload)])
+		self.group.add_actions([("Create", None, _("Create Paste"),
+										 None, _("Create Paste"),
+										 self.on_create_paste)])
+		self.group.add_actions([("Get", None, _("Get Paste"),
+										 None, _("Get Paste"),
+										 self.on_get_paste)])								 
 		manager.insert_action_group(self.group, -1)
-		self.menu_id = manager.add_ui_from_string(self.ui_str)
+		self.create_menu_id = manager.add_ui_from_string(self.create_str)
+		self.get_menu_id = manager.add_ui_from_string(self.get_str)
 
 	def remove_menu(self):
 		manager = self._window.get_ui_manager()
-		manager.remove_ui(self.menu_id)
+		manager.remove_ui(self.create_menu_id)
+		manager.remove_ui(self.get_menu_id)
 		manager.remove_action_group(self.group)
 		manager.ensure_update()
 
-	# Upload menu item handler
-	def on_upload(self, action, data=None):
+	def on_create_paste(self, action, data=None):
 		doc = self._window.get_active_document()
 		upload = UploadDialog(doc)
 		upload.create_dialog()
+	
+	def on_get_paste(self, action, date=None):
+		tab = self._window.create_tab(True)
+		tab_doc = tab.get_document()
+		core = Core()
+		response = core.get_raw_paste("7bpeQbFZ")
+		tab_doc.set_text(response)
