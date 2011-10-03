@@ -24,8 +24,8 @@ class Account():
 			errors.append(gk.NoMatchError)
 			self.GK_EXCEPT = tuple(errors)
 			
-	# Delete account details
 	def delete_details(self):
+		""" Delete account details """
 		try:
 			item = self.__get_item()
 			if item is not None:
@@ -35,17 +35,17 @@ class Account():
 		except self.GK_EXCEPT as e:
 			raise AccountError(repr(e))
 			
-	# Whether account details exists
 	def exists(self):
+		""" Whether account details are stored """
 		try:
 			if self.__get_item() is not None:
 				return True
 			return False
 		except self.GK_EXCEPT as e:
 			raise AccountError(repr(e))
-				
-	# Get the account details from the keyring 
+ 
 	def get_details(self):
+		""" Get the account details """
 		try:
 			item = self.__get_item()
 			if item is not None:
@@ -57,8 +57,8 @@ class Account():
 		except self.GK_EXCEPT as e:
 			raise AccountError(repr(e))
 			
-	# Set the account details with a username and password
 	def set_details(self, usr, pwd):
+		""" Set the account details with a username and password """
 		try:
 			item = self.__get_item()
 			if item is not None:
@@ -71,32 +71,32 @@ class Account():
 		except self.GK_EXCEPT as e:
 			raise AccountError(repr(e))
 			
-	# Get the username from the keyring
 	def __get_usr(self, item):
+		""" Get the username from the account details """
 		attrs = gk.item_get_attributes_sync(self.NAME, item)
 		if "username" in attrs:
 			return attrs.get("username")
 		else:
 			raise AccountError("Username could not be retrieved")
 	
-	# Set the username in the keyring item
 	def __set_usr(self, usr, item):
+		""" Set the username of the account details """
 		attrs = { "username" : str(usr)}
 		gk.item_set_attributes_sync(self.NAME, item, attrs)
 		
-	# Get the password in the keyring item
 	def __get_pwd(self, item):
+		""" Get the password from the account details """
 		info = gk.item_get_info_sync(self.NAME, item)
 		return info.get_secret()
 				
-	# Set the password in the keyring item	
 	def __set_pwd(self, pwd, item):
+		""" Set the password of the account details """
 		info = gk.item_get_info_sync(self.NAME, item)
 		info.set_secret(pwd)
 		gk.item_set_info_sync(self.NAME, item, info)
 	
-	# Get the keyring item
 	def __get_item(self):
+		""" Get the keyring item """
 		keyrings = gk.list_keyring_names_sync()
 		if self.NAME in keyrings:
 			items = gk.list_item_ids_sync(self.NAME)

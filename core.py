@@ -1,7 +1,6 @@
 import os
 import re
 import urllib
-
 import xml.dom.minidom
 
 class Core():
@@ -25,15 +24,15 @@ class Core():
 	DEV_KEY = "1d6e3cfe11d7f9d2b72a060662c1009d"
 	API_FILE = "api.xml"
 	
-	# Create a core object to communicate with Pastebin
 	def __init__(self):
+		""" Create a core object to communicate with Pastebin """
 		self.langs = {}
 		self.dates = {}
 		self.visibilities = {}
 		self.__load_api_options()
 		
-	# Load the Pastebin API from file
 	def __load_api_options(self):
+		""" Load the pastebin api options from file """
 		try:
 			dirname = os.path.dirname(__file__)
 			fd = os.path.join(dirname, self.API_FILE)
@@ -47,59 +46,60 @@ class Core():
 		except IOError as e:
 			raise CoreError(e)
 		
-	# Store the api options into a store dictionary
 	def __store_api_options(self, options, store):
+		""" Store the api options into a store dictionary """
 		for option in options:
 			name = option.getElementsByTagName("name").item(0)
 			value = option.getElementsByTagName("value").item(0)
 			store[name.firstChild.data] = value.firstChild.data
 
-	# Set the developer key
 	def __set_dev_key(self, parameters):
+		""" Set the developer key """
 		parameters[self.API_DEV_KEY] = self.DEV_KEY
-	
-	# Set a valid user session key 
+	 
 	def __set_usr_key(self, key, parameters):
+		""" Set a valid user session key """
 		parameters[self.API_USER_KEY] = key
 	
-	# Set the paste text
 	def __set_paste_text(self, text, parameters):
+		""" Set the paste text """
 		parameters[self.API_PASTE_CODE] = text
 			
-	# Sets the paste name or title
 	def __set_paste_name(self, name, parameters):
+		""" Sets the paste name or title """
 		parameters[self.API_PASTE_NAME] = name
 		
-	# Sets whether a paste is public or private
 	def __set_private(self, private, parameters):
+		""" Sets whether a paste is public or private """
 		if private in self.visibilities:
 			p = self.visibilities.get(private)
 			parameters[self.API_PASTE_PRIVATE] = p
 		else:
 			raise CoreError("Bad API request, invalid api_paste_private")
-
-	# Sets the expiration date of the paste 
+ 
 	def __set_paste_expire(self, date, parameters):
+		""" Sets the expiration date of the paste """
 		if date in self.dates:
 			d = self.dates.get(date)
 			parameters[self.API_PASTE_EXPIRE_DATE] = d
 		else:
 			raise CoreError("Bad API request, invalid api_expire_date")
 
-	# Sets the syntax highlighting of the paste
+	
 	def __set_paste_lang(self, lang, parameters):
+		""" Sets the syntax highlighting of the paste """
 		pattern = "(\s|^)" + lang + "(\s|$)"
 		for name, value in self.langs.iteritems():
 			matches = re.findall(pattern, name, re.I)
 			if len(matches) != 0:
 				parameters[self.API_PASTE_FORMAT] = value	
 	
-	# Sets the api action
 	def __set_option(self, option, parameters):
+		""" Sets the api action """
 		parameters[self.API_OPTION] = option
 
-	# Sets the username
 	def __set_usr_details(self, usr, pwd, parameters):
+		""" Sets the username of paste """
 		parameters[self.API_USER_NAME] = usr
 		parameters[self.API_USER_PASSWORD] = pwd		
 
@@ -110,8 +110,9 @@ class Core():
 	#	else:
 	#		raise CoreError("API Result Limit cannot be set")
 	
-	# Make a URL POST request 
+	
 	def __post_request(self, url, parameters):
+		""" Make a POST request """
 		encoded = urllib.urlencode(parameters)
 		fd = urllib.urlopen(url, encoded)
 		try:
@@ -123,8 +124,9 @@ class Core():
 			raise CoreError(response)
 		return response
 	
-	# Make a URL GET request
+	
 	def __get_request(self, url, parameters):
+		""" Make a URL GET request """
 		encoded = urllib.urlencode(parameters)
 		fd = urllib.urlopen("%s?%s" % (url, encoded))
 		try:
@@ -134,8 +136,8 @@ class Core():
 		del fd
 		return response
 
-	# Login to pastebin to get user session key
 	def __login(self, usr, pwd):
+		""" Login to pastebin to get user session key """
 		parameters = {}
 		self.__set_dev_key(parameters)
 		self.__set_usr_details(usr, pwd, parameters)
@@ -169,10 +171,10 @@ class Core():
 	def get_visibilities(self):
 		return self.visibilities.keys()
 		
-	# Make a paste to pastebin
 	def paste(
 			self, text, name=None, visibility=None, date=None,
 			lang=None, usr=None, pwd=None):
+		""" Make a paste to pastebin """
 		parameters = {}
 		self.__set_dev_key(parameters)
 		self.__set_option("paste", parameters)
